@@ -1,0 +1,138 @@
+/**
+ *
+ * Apply Here your Custom CSS
+ *
+*/
+
+body
+{
+    font-color: black;
+}
+
+.datatable {
+    color : #1b1a1a !important;
+}
+
+.not-allowed
+{
+    cursor: not-allowed;
+    color: lightcoral!important;
+}
+.allowed
+{
+    color: lightgreen!important;
+}
+
+
+/* Code setFlash */
+.message
+{
+    text-align: center;
+    font-size: 18px;
+    padding: 15px;
+    margin-bottom: 17px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+}
+.success
+{
+    background-color: #99b798;
+    border-color: #b4e8a8;
+    color: #0d2f0d;
+}
+.info
+{
+    background-color: #c5e8f7;
+    border-color: #a6e8f3;
+    color: #2c7ea1;
+}
+.warning
+{
+    background-color: #ffefa4;
+    border-color: #ffd78a;
+    color: #574802;
+}
+.error
+{
+    background-color: #ffc9c9;
+    border-color: #ffafbd;
+    color: #ac1818;
+}
+/* Fin code setFlash */
+
+.textfontsize16
+{
+    font-size: 16px;
+}
+
+/* Code user profil */
+#profile-image1
+{
+    cursor: pointer;
+    width: 100px;
+    height: 100px;
+	border:2px solid #03b1ce ;
+}
+#user-panel-heading
+{
+    padding: 10px;
+}
+.tital
+{
+    color: black;
+    font-size:16px;
+    font-weight:500;
+}
+.bot-border
+{
+    border-bottom:1px #f8f8f8 solid;
+    margin:5px 0  5px 0;
+}
+/* Fin code user profil */
+th.th8c94ff
+{
+    background-color: #8c94ff!important;
+    color: black!important;
+}
+
+table.table-striped
+{
+    background-color: #c0c5ff;
+    color: black;
+}
+
+.table-center th, .table-center td {
+    text-align:center;
+    padding : 0 !important;
+    height : 25px;
+    max-height: 25px;
+}
+
+.table-center td:first-child {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.calendar-td {
+    width:300px;
+    max-width: 300px;
+
+}
+
+.calendar-th {
+    min-width: 300px;
+}
+
+.btn-calendar {
+    word-wrap: break-word;
+    width: 50px;
+    max-width: 50px;
+    height:25px;
+    padding:2px !important;
+    vertical-align: top;
+    display : inline-grid;
+}
+
+.datetimepicker {
+    z-index:99999  !important;
+}
