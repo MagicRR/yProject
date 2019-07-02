@@ -10,7 +10,8 @@
 
 <div class="container">
 
-    <?= $this->Form->create($jeux) ?>
+    <form action="/jeux" method="post">
+        <input type="hidden" name="_csrfToken" value="<?php echo $csrf; ?>"/>
         <div class="row">
             <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6">
             <?php
@@ -87,28 +88,54 @@
           <th scope="col">TITRE</th>
           <th scope="col">CATEGORIE</th>
           <th scope="col">DATE DE SORTIE</th>
-          <th scope="col">OPERATIONS</th>
+          <th scope="col">DISPONIBILITE</th>
         </tr>
       </thead>
       <tbody>
           <?php
+          // echo "
+          // <td>
+          //     <form action='jeux/modifierDispo/".$games['jeux']['id']."' method='post'>
+          //         <input type='hidden' name='_csrfToken' value='".$csrf."'/>
+          //         <button type='input' class='btn'>
+          //             <i style='font-size: 24px; color: red;' class='entypo-cancel-squared'></i>
+          //         </button>
+          //     </form>
+          // </td>";
             foreach($tousLesJeux as $games)
             {
                 echo "<tr>";
-                    echo "<td>".$games['jeux']['id']."</td>";
+                    echo "<td><a href='/jeux/edit/".$games['jeux']['id']."'> ".$games['jeux']['id']."</a></td>";
                     echo "<td>".$games['jeux']['titre']."</td>";
                     echo "<td>".$games['cj']['libelle']."</td>";
                     echo "<td>".$games['jeux']['date_de_sortie']."</td>";
-                    echo "<td><a href='#' class='btn btn-default btn-sm btn-icon icon-left'>
-                                <i class='entypo-pencil'></i>Edit
-                              </a>
-                              <a href='#' class='btn btn-danger btn-sm btn-icon icon-left'>
-                                <i class='entypo-cancel'></i>Delete
-                              </a>
-                              <a href='#' class='btn btn-info btn-sm btn-icon icon-left'>
-                                <i class='entypo-info'></i>Profile
-                            </a>
+                    if($games['jeux']['en_stock'] == 0)
+                    {
+                        echo "
+                        <td>
+                            <button type='input' class='btn boutonDispo' id=".$games['jeux']['id'].">
+                                <i id='entypo".$games['jeux']['id']."' style='font-size: 24px; color: red;' class='entypo-cancel-squared'></i>
+                            </button>
                         </td>";
+                    }
+                    else
+                    {
+                        echo "
+                        <td>
+                            <button type='input' class='btn boutonDispo' id=".$games['jeux']['id'].">
+                                <i id='entypo".$games['jeux']['id']."' style='font-size: 24px; color: green;' class='entypo-check'></i>
+                            </button>
+                        </td>";
+                    }
+                    // echo " <a href='#' class='btn btn-default btn-sm btn-icon icon-left'>
+                    //             <i class='entypo-pencil'></i>Edit
+                    //           </a>
+                    //           <a href='#' class='btn btn-danger btn-sm btn-icon icon-left'>
+                    //             <i class='entypo-cancel'></i>Delete
+                    //           </a>
+                    //           <a href='#' class='btn btn-info btn-sm btn-icon icon-left'>
+                    //             <i class='entypo-info'></i>Profile
+                    //         </a>";
                 echo "</tr>";
             }
 
@@ -121,8 +148,43 @@
 
 <script type="text/javascript">
     $(function () {
+
+        $( ".boutonDispo" ).click(function() {
+
+            var id = $(this).attr('id');
+            var entypoId = $(this).children("i").attr("id");
+            var entypoClass = $(this).children("i").attr('class');
+
+            $.ajax({
+                url: "/jeux/modifierDispo/"+id,
+                dataType: 'json',
+                headers :
+                {
+                    'X-CSRF-Token': '<?php echo $csrf ?>'
+                },
+			    type: "POST",
+                success: function(rep) {
+                    id = rep['id'];
+                    var entypo = $('#entypo'+id).attr('class');
+                    if($('#entypo'+id).attr('class') == 'entypo-check')
+                    {
+                        $('#entypo'+id).removeClass("entypo-check");
+                        $('#entypo'+id).addClass("entypo-cancel-squared");
+                        $('#entypo'+id).css("color", "red");
+                    }
+                    else
+                    {
+                        $('#entypo'+id).removeClass("entypo-cancel-squared");
+                        $('#entypo'+id).addClass("entypo-check");
+                        $('#entypo'+id).css("color", "green");
+                    }
+				}
+            })
+        });
+
         $('#datetimepicker2').datetimepicker({
             locale: 'fr'
         });
+
     });
 </script>

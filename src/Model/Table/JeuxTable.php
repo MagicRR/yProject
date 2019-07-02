@@ -53,8 +53,22 @@ class JeuxTable extends Table
             ->allowEmptyString('titre');
 
         $validator
+            ->scalar('description')
+            ->allowEmptyString('description');
+
+        $validator
             ->integer('categorie')
             ->allowEmptyString('categorie');
+
+        $validator
+            ->boolean('en_stock')
+            ->requirePresence('en_stock', 'create')
+            ->allowEmptyString('en_stock', false);
+
+        $validator
+            ->scalar('url_jaquette')
+            ->maxLength('url_jaquette', 255)
+            ->allowEmptyString('url_jaquette');
 
         $validator
             ->date('date_de_sortie')

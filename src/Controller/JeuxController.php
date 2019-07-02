@@ -21,6 +21,9 @@ class JeuxController extends AppController
      */
     public function index()
     {
+        if(isset($_COOKIE['csrfToken']))
+            $csrf = $_COOKIE['csrfToken'];
+        $this->set(compact('csrf'));
 
         $this->loadModel('CategorieJeux');
         $categories = $this->paginate($this->CategorieJeux);
@@ -50,6 +53,7 @@ class JeuxController extends AppController
             $categoriePlus = $this->request->getData('categories');
             $categoriePlus++;
             $data['categorie']      = $categoriePlus;
+            $data['en_stock']       = 1;
             $data['date_de_sortie'] = $arrayDate;
             $jeux = $this->Jeux->patchEntity($jeux, $data);
 
@@ -79,7 +83,8 @@ class JeuxController extends AppController
         // Jointure de l'espace !
         $tousLesJeux = $this->Jeux
                 ->find()
-                ->select(['jeux.id','jeux.titre','jeux.date_de_sortie','jeux.categorie','cj.libelle','cj.id'])
+                ->select(['jeux.id','jeux.titre','jeux.description','jeux.date_de_sortie',
+                'jeux.categorie', 'jeux.en_stock' ,'jeux.url_jaquette','cj.libelle','cj.id'])
                 ->where(['jeux.id !=' => 0])
                 ->join([
                 'table' => 'categorie_jeux',
@@ -95,7 +100,6 @@ class JeuxController extends AppController
             $unJeu['jeux']['date_de_sortie'] = $dateTemp->format('d / m / Y');
         }
         $this->set(compact('tousLesJeux'));
-
         $this->viewBuilder()->setLayout('neonDefault');
     }
 
@@ -124,17 +128,38 @@ class JeuxController extends AppController
      */
     public function edit($id = null)
     {
-        $jeux = $this->Jeux->get($id, [
-            'contain' => []
-        ]);
-        if ($this->request->is(['patch', 'post', 'put'])) {
-            $jeux = $this->Jeux->patchEntity($jeux, $this->request->getData());
-            if ($this->Jeux->save($jeux)) {
-                $this->Flash->success(__('The jeux has been saved.'));
+        $jeux = $this->Jeux->get($id);
 
-                return $this->redirect(['action' => 'index']);
+        if ($this->request->is(['patch', 'post', 'put'])) {
+
+
+
+            $extension = pathinfo($this->request->data['url_jaquette']['name'], PATHINFO_EXTENSION);
+            $fileName = 'wc3.'.$extension;
+
+            $tempName = $this->request->data['url_jaquette']['tmp_name'];
+            $fold = WWW_ROOT.'upload/jeux/'.$this->request->data['titre'];
+            $pathfinal = $fold.'/'.$fileName;
+            if (!file_exists($fold))
+                mkdir($fold, 0777, true);
+
+            move_uploaded_file($tempName, $pathfinal);
+
+            $data = $this->request->getData();
+
+            $jeux = $this->Jeux->patchEntity($jeux, $data);
+            if(!empty($_FILES))
+                $jeux->url_jaquette = $fileName;
+            else
+                $jeux->url_jaquette = $jeux->url_jaquette;
+
+            // debug($jeux);
+            if ($this->Jeux->save($jeux)) {
+                $this->Flash->success(__('SAUVEGARDE.'));
+
+                return $this->redirect(['action' => 'edit', $id]);
             }
-            $this->Flash->error(__('The jeux could not be saved. Please, try again.'));
+            $this->Flash->error(__('ERREUR.'));
         }
         $this->set(compact('jeux'));
     }
@@ -157,5 +182,20 @@ class JeuxController extends AppController
         }
 
         return $this->redirect(['action' => 'index']);
+    }
+
+    public function modifierDispo($id)
+    {
+        $jeu = $this->Jeux->get($id);
+
+        if($jeu->en_stock == true)
+            $jeu->en_stock = 0;
+        else
+            $jeu->en_stock = 1;
+
+        // Sauvegarde
+        $this->Jeux->save($jeu);
+
+        return $this->response->withType("application/json")->withStringBody(json_encode($jeu));
     }
 }
