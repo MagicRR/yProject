@@ -100,6 +100,7 @@ class JeuxController extends AppController
             $unJeu['jeux']['date_de_sortie'] = $dateTemp->format('d / m / Y');
         }
         $this->set(compact('tousLesJeux'));
+
         $this->viewBuilder()->setLayout('neonDefault');
     }
 
@@ -128,11 +129,16 @@ class JeuxController extends AppController
      */
     public function edit($id = null)
     {
+        if(isset($_COOKIE['csrfToken']))
+            $csrf = $_COOKIE['csrfToken'];
+        $this->set(compact('csrf'));
+
         $jeux = $this->Jeux->get($id);
 
-        if ($this->request->is(['patch', 'post', 'put'])) {
+        if ($this->request->is(['patch', 'post', 'put']))
+        {
 
-
+            debug($this->request->getData());
 
             $extension = pathinfo($this->request->data['url_jaquette']['name'], PATHINFO_EXTENSION);
             $fileName = 'wc3.'.$extension;
@@ -162,6 +168,54 @@ class JeuxController extends AppController
             $this->Flash->error(__('ERREUR.'));
         }
         $this->set(compact('jeux'));
+
+        // Gestion Files
+        $this->loadModel('Files');
+        $files = $this->Files->newEntity();
+
+        $allFiles = $this->paginate($this->Files);
+
+        $this->set(compact('files'));
+        $this->set(compact('allFiles'));
+    }
+
+    public function uploadFile()
+    {
+        $this->loadModel('Files');
+        $files = $this->Files->newEntity();
+
+        $allFiles = $this->paginate($this->Files);
+
+        if ($this->request->is(['patch', 'post', 'put']))
+        {
+            $data = $this->request->getData();
+            debug($data);
+            $extension = pathinfo($this->request->data['path']['name'], PATHINFO_EXTENSION);
+            $fileName = $this->request->data['path']['name'];
+
+            $tempName = $this->request->data['path']['tmp_name'];
+            $fold = WWW_ROOT.'upload/files/1';
+            $pathfinal = $fold.'/'.$fileName;
+            if (!file_exists($fold))
+                mkdir($fold, 0777, true);
+
+            move_uploaded_file($tempName, $pathfinal);
+
+
+
+            $files = $this->Files->patchEntity($files, $data);
+
+
+            // if ($this->Jeux->save($jeux)) {
+            //     $this->Flash->success(__('SAUVEGARDE.'));
+            //
+            //     return $this->redirect(['action' => 'edit', $id]);
+            // }
+            // $this->Flash->error(__('ERREUR.'));
+        }
+        $this->set(compact('files'));
+        $this->set(compact('allFiles'));
+        return $this->redirect(['action' => 'edit', 1]);
     }
 
     /**

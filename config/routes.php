@@ -91,6 +91,12 @@ Router::scope('/', function (RouteBuilder $routes) {
     $routes->fallbacks(DashedRoute::class);
 });
 
+Router::plugin('FileManager', ['path' => '/file-manager'], function ($routes) {
+	$routes->connect('/', ['controller' => 'FileManager', 'action' => 'index']);
+    $routes->fallbacks('DashedRoute');
+});
+
+
 /**
  * If you need a different set of middleware or none at all,
  * open new scope and define routes there.

@@ -34,6 +34,10 @@ class Application extends BaseApplication
      */
     public function bootstrap()
     {
+        $this->addPlugin('FileManager', ['bootstrap' => true, 'routes' => true]);
+
+        $this->addPlugin('FileManager', ['bootstrap' => true, 'routes' => true]);
+
         // Call parent to load bootstrap from files.
         parent::bootstrap();
 
